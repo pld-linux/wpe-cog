@@ -1,0 +1,28 @@
+--- cog-0.5.1/CMakeLists.txt.orig	2020-03-04 19:24:28.912971337 +0100
++++ cog-0.5.1/CMakeLists.txt	2020-03-04 19:24:32.909616352 +0100
+@@ -120,6 +120,7 @@
+     endif ()
+     add_definitions(-DCOG_BG_COLOR_API_SUPPORTED=1)
+ else ()
++    set(COGCORE_DL_LDFLAGS "-ldl")
+     list(APPEND COGCORE_API_HEADERS core/cog-platform.h)
+     list(APPEND COGCORE_SOURCES core/cog-platform.c)
+     # There is no need to explicitly check wpe-1.0 here because it's a
+@@ -144,7 +145,7 @@
+ if (HAS_WALL)
+   set(COGCORE_CFLAGS ${WEB_ENGINE_CFLAGS_OTHER} ${SOUP_CFLAGS_OTHER} "-Wall")
+ endif ()
+-set(COGCORE_LDFLAGS ${WEB_ENGINE_LDFLAGS} ${SOUP_LDFLAGS})
++set(COGCORE_LDFLAGS ${WEB_ENGINE_LDFLAGS} ${SOUP_LDFLAGS} ${COGCORE_DL_LDFLAGS})
+ 
+ 
+ if (COG_DBUS_SYSTEM_BUS)
+@@ -180,7 +181,7 @@
+     if (HAS_WALL)
+       target_compile_options(cog PUBLIC "-Wall")
+     endif ()
+-    target_link_libraries(cog cogcore -ldl)
++    target_link_libraries(cog cogcore)
+ 
+     add_executable(cogctl cogctl.c core/cog-utils.c)
+     set_property(TARGET cogctl PROPERTY C_STANDARD 99)
