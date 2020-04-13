@@ -13,12 +13,12 @@
 Summary:	Cog Core - WPE WebKit base launcher
 Summary(pl.UTF-8):	Cog Core - narzędzie do uruchamiania środowiska WPE WebKit
 Name:		wpe-cog
-Version:	0.5.1
+Version:	0.7.1
 Release:	1
 License:	MIT
 Group:		Libraries
 Source0:	https://wpewebkit.org/releases/cog-%{version}.tar.xz
-# Source0-md5:	48ceb4159b7f14324fa8d3c480968d40
+# Source0-md5:	f2c51cd444ca54d8042e99b3e8a3fa78
 Patch0:		cog-link.patch
 URL:		https://wpewebkit.org/
 BuildRequires:	cmake >= 3.3
@@ -30,8 +30,7 @@ BuildRequires:	xz
 %if %{with gtk}
 BuildRequires:	gtk-webkit4-devel >= 2.20.0
 %else
-# TODO: 2.28 when available
-BuildRequires:	wpe-webkit-devel >= 2.24.0
+BuildRequires:	wpe-webkit-devel >= 2.28.0
 %if %{with drm}
 BuildRequires:	EGL-devel
 BuildRequires:	Mesa-libgbm-devel >= 13.0
@@ -83,7 +82,7 @@ Requires:	glib2 >= 1:2.44
 %if %{with gtk}
 Requires:	gtk-webkit4 >= 2.20.0
 %else
-Requires:	wpe-webkit >= 2.24.0
+Requires:	wpe-webkit >= 2.28.0
 %endif
 
 %description libs
@@ -100,7 +99,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 %if %{with gtk}
 Requires:	gtk-webkit4-devel >= 2.20.0
 %else
-Requires:	wpe-webkit-devel >= 2.24.0
+Requires:	wpe-webkit-devel >= 2.28.0
 %endif
 
 %description devel
