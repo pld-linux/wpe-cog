@@ -3,7 +3,7 @@
 %bcond_with	gtk		# WebKitGTK+ instead of WPEWebKit
 %bcond_without	drm		# DRM platform module
 %bcond_without	fdo		# FDO platform module
-%bcond_with	weston		# direct display support for FDO platform module
+%bcond_with	weston		# direct display support for FDO platform module (requires private protocol files)
 #
 %if %{with gtk}
 %undefine	with_drm
@@ -13,17 +13,18 @@
 Summary:	Cog Core - WPE WebKit base launcher
 Summary(pl.UTF-8):	Cog Core - narzędzie do uruchamiania środowiska WPE WebKit
 Name:		wpe-cog
-Version:	0.7.1
+Version:	0.8.0
 Release:	1
 License:	MIT
 Group:		Libraries
 Source0:	https://wpewebkit.org/releases/cog-%{version}.tar.xz
-# Source0-md5:	f2c51cd444ca54d8042e99b3e8a3fa78
+# Source0-md5:	f7aa8a425927cab247563411fc67c5a3
 Patch0:		cog-link.patch
 URL:		https://wpewebkit.org/
 BuildRequires:	cmake >= 3.3
 BuildRequires:	gcc >= 5:3.2
 BuildRequires:	glib2-devel >= 1:2.44
+BuildRequires:	libsoup-devel >= 2.4
 BuildRequires:	pkgconfig
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	xz
@@ -47,7 +48,7 @@ BuildRequires:	wayland-egl-devel
 BuildRequires:	wpebackend-fdo-devel >= 1.3.1
 BuildRequires:	xorg-lib-libxkbcommon-devel
 %if %{with weston}
-BuildRequires:	weston-devel >= 9
+BuildRequires:	weston-protocols >= 9.0.0
 %endif
 %endif
 %endif
