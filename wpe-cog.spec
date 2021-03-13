@@ -13,12 +13,12 @@
 Summary:	Cog Core - WPE WebKit base launcher
 Summary(pl.UTF-8):	Cog Core - narzędzie do uruchamiania środowiska WPE WebKit
 Name:		wpe-cog
-Version:	0.8.0
+Version:	0.8.1
 Release:	1
 License:	MIT
 Group:		Libraries
 Source0:	https://wpewebkit.org/releases/cog-%{version}.tar.xz
-# Source0-md5:	f7aa8a425927cab247563411fc67c5a3
+# Source0-md5:	21664fb04c9149dea6d68e13e6074276
 Patch0:		cog-link.patch
 URL:		https://wpewebkit.org/
 BuildRequires:	cmake >= 3.3
