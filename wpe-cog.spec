@@ -1,10 +1,11 @@
 #
 # Conditional build:
-%bcond_without	drm		# DRM platform module
-%bcond_without	fdo		# FDO platform module
-%bcond_without	gtk4		# GTK4 platform module
-%bcond_without	x11		# X11 platform module
-%bcond_with	weston		# direct display support for FDO platform module (requires private protocol files)
+%bcond_without	apidocs	# API documentation
+%bcond_without	drm	# DRM platform module
+%bcond_without	fdo	# FDO platform module
+%bcond_without	gtk4	# GTK4 platform module
+%bcond_without	x11	# X11 platform module
+%bcond_with	weston	# direct display support for FDO platform module (requires private protocol files)
 #
 Summary:	Cog Core - WPE WebKit base launcher
 Summary(pl.UTF-8):	Cog Core - narzędzie do uruchamiania środowiska WPE WebKit
@@ -22,9 +23,15 @@ BuildRequires:	gcc >= 5:3.2
 BuildRequires:	glib2-devel >= 1:2.44
 BuildRequires:	libsoup-devel >= 2.4
 BuildRequires:	pkgconfig
+BuildRequires:	rpm-build >= 4.6
+BuildRequires:	rpmbuild(macros) >= 1.605
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	wpe-webkit-devel >= 2.28.0
 BuildRequires:	xz
+%if %{with apidocs}
+BuildRequires:	gobject-introspection-devel
+BuildRequires:	gi-docgen
+%endif
 %if %{with drm}
 BuildRequires:	EGL-devel
 BuildRequires:	Mesa-libgbm-devel >= 13.0
@@ -107,6 +114,18 @@ Header files for Cog Core library.
 %description devel -l pl.UTF-8
 Pliki nagłówkowe biblioteki Cog Core.
 
+%package apidocs
+Summary:	API documentation for Cog Core library
+Summary(pl.UTF-8):	Dokumentacja API biblioteki Cog Core
+Group:		Documentation
+BuildArch:	noarch
+
+%description apidocs
+API documentation for Cog Core library.
+
+%description apidocs -l pl.UTF-8
+Dokumentacja API biblioteki Cog Core.
+
 %prep
 %setup -q -n cog-%{version}
 %patch0 -p1
@@ -116,6 +135,7 @@ install -d build
 cd build
 # .pc file creation expects relative CMAKE_INSTALL_LIBDIR
 %cmake .. \
+	%{?with_apidocs:-DBUILD_DOCS=ON} \
 	-DCMAKE_INSTALL_LIBDIR=%{_lib} \
 	-DCOG_HOME_URI="https://www.pld-linux.org/" \
 	%{?with_drm:-DCOG_PLATFORM_DRM=ON} \
@@ -170,3 +190,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/libcogcore.so
 %{_includedir}/cog
 %{_pkgconfigdir}/cogcore.pc
+
+%if %{with apidocs}
+%files apidocs
+%defattr(644,root,root,755)
+%doc build/docs/html/*
+%endif
