@@ -1,26 +1,18 @@
---- cog-0.5.1/CMakeLists.txt.orig	2020-03-04 19:24:28.912971337 +0100
-+++ cog-0.5.1/CMakeLists.txt	2020-03-04 19:24:32.909616352 +0100
-@@ -120,6 +120,7 @@
-     endif ()
-     add_definitions(-DCOG_BG_COLOR_API_SUPPORTED=1)
- else ()
-+    set(COGCORE_DL_LDFLAGS "-ldl")
-     list(APPEND COGCORE_API_HEADERS core/cog-platform.h)
-     list(APPEND COGCORE_SOURCES core/cog-platform.c)
-     # There is no need to explicitly check wpe-1.0 here because it's a
-@@ -144,7 +145,7 @@
+--- cog-0.10.0/CMakeLists.txt.orig	2021-05-18 17:03:23.000000000 +0200
++++ cog-0.10.0/CMakeLists.txt	2021-08-17 18:55:07.355282549 +0200
+@@ -159,7 +159,7 @@
+     VERSION ${COGCORE_VERSION}
+     SOVERSION ${COGCORE_VERSION_MAJOR}
+ )
+-target_link_libraries(cogcore PkgConfig::WEB_ENGINE PkgConfig::SOUP)
++target_link_libraries(cogcore PkgConfig::WEB_ENGINE PkgConfig::SOUP -ldl)
+ target_compile_definitions(cogcore PRIVATE G_LOG_DOMAIN=\"Cog-Core\")
  if (HAS_WALL)
-   set(COGCORE_CFLAGS ${WEB_ENGINE_CFLAGS_OTHER} ${SOUP_CFLAGS_OTHER} "-Wall")
- endif ()
--set(COGCORE_LDFLAGS ${WEB_ENGINE_LDFLAGS} ${SOUP_LDFLAGS})
-+set(COGCORE_LDFLAGS ${WEB_ENGINE_LDFLAGS} ${SOUP_LDFLAGS} ${COGCORE_DL_LDFLAGS})
- 
- 
- if (COG_DBUS_SYSTEM_BUS)
-@@ -180,7 +181,7 @@
-     if (HAS_WALL)
+     target_compile_options(cogcore PUBLIC -Wall)
+@@ -172,7 +172,7 @@
        target_compile_options(cog PUBLIC "-Wall")
      endif ()
+     target_compile_definitions(cog PRIVATE G_LOG_DOMAIN=\"Cog\")
 -    target_link_libraries(cog cogcore -ldl)
 +    target_link_libraries(cog cogcore)
  
