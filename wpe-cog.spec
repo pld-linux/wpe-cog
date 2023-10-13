@@ -12,27 +12,31 @@
 Summary:	Cog Core - WPE WebKit base launcher
 Summary(pl.UTF-8):	Cog Core - narzędzie do uruchamiania środowiska WPE WebKit
 Name:		wpe-cog
-Version:	0.12.4
+Version:	0.18.0
 Release:	1
 License:	MIT
 Group:		Libraries
 Source0:	https://wpewebkit.org/releases/cog-%{version}.tar.xz
-# Source0-md5:	cdb8acdc3acc9b5082e7db9c279155c3
+# Source0-md5:	9521458c72322e1b2e39e8b1cca93d24
 URL:		https://wpewebkit.org/
-BuildRequires:	cmake >= 3.3
 BuildRequires:	gcc >= 5:3.2
 %{!?with_libsoup3:BuildRequires:	glib2-devel >= 1:2.44}
 %{?with_libsoup3:BuildRequires:	glib2-devel >= 1:2.67.4}
+BuildRequires:	libepoxy-devel
+BuildRequires:	libmanette-devel >= 0.2.4
 %{!?with_libsoup3:BuildRequires:	libsoup-devel >= 2.4}
 %{?with_libsoup3:BuildRequires:	libsoup3-devel >= 3.0}
 BuildRequires:	libsoup-devel >= 2.4
+BuildRequires:	libwpe-devel >= 1.14
+BuildRequires:	meson >= 0.53.2
+BuildRequires:	ninja >= 1.5
 BuildRequires:	pkgconfig
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 1.605
 BuildRequires:	tar >= 1:1.22
-%{!?with_libsoup3:BuildRequires:	wpe-webkit-devel >= 2.28.0}
-%{?with_libsoup3:BuildRequires:	wpe-webkit1.1-devel >= 2.33.1}
-BuildRequires:	wpe-webkit-devel >= 2.28.0
+%{!?with_libsoup3:BuildRequires:	wpe-webkit-devel >= 2.34}
+%{?with_libsoup3:BuildRequires:	wpe-webkit2-devel >= 2.40}
+BuildRequires:	wpebackend-fdo-devel >= 1.8.0
 BuildRequires:	xz
 %if %{with apidocs}
 BuildRequires:	gobject-introspection-devel
@@ -46,14 +50,9 @@ BuildRequires:	libinput-devel
 BuildRequires:	udev-devel
 # wayland-server
 BuildRequires:	wayland-devel
-BuildRequires:	wpebackend-fdo-devel >= 1.4.0
 %endif
 %if %{with gtk4}
 BuildRequires:	gtk4-devel >= 4.0
-BuildRequires:	wpebackend-fdo-devel
-%endif
-%if %{with headless}
-BuildRequires:	wpebackend-fdo-devel >= 1.8.0
 %endif
 %if %{with wayland}
 BuildRequires:	EGL-devel
@@ -62,36 +61,28 @@ BuildRequires:	cairo-devel
 BuildRequires:	wayland-devel >= 1.10
 BuildRequires:	wayland-egl-devel
 BuildRequires:	wayland-protocols
-BuildRequires:	wpebackend-fdo-devel >= 1.6.0
 BuildRequires:	xorg-lib-libxkbcommon-devel
 %if %{with weston}
-BuildRequires:	weston-protocols >= 9.0.0
+BuildRequires:	weston-protocols >= 12.0.0
 %endif
 %endif
 %if %{with x11}
 BuildRequires:	EGL-devel
 BuildRequires:	libxcb-devel
-BuildRequires:	wpebackend-fdo-devel >= 1.6.0
 BuildRequires:	xorg-lib-libxkbcommon-x11-devel
 %endif
+Requires:	wpebackend-fdo >= 1.8.0
 Requires:	%{name}-libs = %{version}-%{release}
 %if %{with drm}
 Requires:	Mesa-libgbm >= 13.0
 Requires:	libdrm >= 2.4.71
-Requires:	wpebackend-fdo >= 1.4.0
-%endif
-%if %{with headless}
-BuildRequires:	wpebackend-fdo >= 1.8.0
 %endif
 %if %{with wayland}
 Requires:	wayland >= 1.10
 Requires:	wpebackend-fdo >= 1.6.0
 %if %{with weston}
-Requires:	weston >= 9
+Requires:	weston >= 12
 %endif
-%endif
-%if %{with x11}
-Requires:	wpebackend-fdo >= 1.6.0
 %endif
 # cog in PLD used to be different project: http://www.krakoa.dk/old-linux-software.html#COG
 Conflicts:	cog
@@ -111,8 +102,8 @@ Group:		Libraries
 %{?with_libsoup3:Requires:	glib2 >= 1:2.67.4}
 %{!?with_libsoup3:Requires:	libsoup >= 2.4}
 %{?with_libsoup3:Requires:	libsoup3 >= 3.0}
-%{!?with_libsoup3:Requires:	wpe-webkit >= 2.28.0}
-%{?with_libsoup3:Requires:	wpe-webkit1.1 >= 2.33.1}
+%{!?with_libsoup3:Requires:	wpe-webkit >= 2.34}
+%{?with_libsoup3:Requires:	wpe-webkit2 >= 2.40}
 
 %description libs
 Cog Core library.
@@ -125,8 +116,8 @@ Summary:	Header files for Cog Core library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki Cog Core
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
-%{!?with_libsoup3:Requires:	wpe-webkit-devel >= 2.28.0}
-%{?with_libsoup3:Requires:	wpe-webkit1.1-devel >= 2.33.1}
+%{!?with_libsoup3:Requires:	wpe-webkit-devel >= 2.34}
+%{?with_libsoup3:Requires:	wpe-webkit2-devel >= 2.40}
 
 %description devel
 Header files for Cog Core library.
@@ -150,29 +141,21 @@ Dokumentacja API biblioteki Cog Core.
 %setup -q -n cog-%{version}
 
 %build
-install -d build
-cd build
-# .pc file creation expects relative CMAKE_INSTALL_LIBDIR
-%cmake .. \
-	%{?with_apidocs:-DBUILD_DOCS=ON} \
-	-DCMAKE_INSTALL_LIBDIR=%{_lib} \
-	-DCOG_HOME_URI="https://www.pld-linux.org/" \
-	%{!?with_drm:-DCOG_PLATFORM_DRM=OFF} \
-	%{?with_gtk4:-DCOG_PLATFORM_GTK4=ON} \
-	%{!?with_headless:-DCOG_PLATFORM_HEADLESS=OFF} \
-	%{!?with_wayland:-DCOG_PLATFORM_WL=OFF} \
-	%{?with_x11:-DCOG_PLATFORM_X11=ON} \
-	%{?with_gtk4:-DCOG_USE_WEBKITGTK=ON} \
-	%{?with_weston:-DCOG_WESTON_DIRECT_DISPLAY=ON} \
-	%{?with_libsoup3:-DUSE_SOUP2=OFF}
+PLATFORMS="%{?with_drm:drm} %{?with_headless:headless} %{?with_wayland:wayland} %{?with_gtk4:gtk4} %{?with_x11:x11}"
+%meson build \
+	-Dcog_home_uri:-Dcog_home_uri="https://www.pld-linux.org/" \
+	%{?with_apidocs:-Ddocumentation=true} \
+	-Dplatforms="$(echo $PLATFORMS | sed -e 's/ \+/,/g')" \
+	%{?with_weston:-Dwayland_weston_direct_display=true} \
+	-Dwpe_api=%{?with_libsoup3:2.0}%{!?with_libsoup3:1.0} \
+# -Dwayland_weston_content_protection=true ?
 
-%{__make}
+%ninja_build -C build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%{__make} -C build install \
-	DESTDIR=$RPM_BUILD_ROOT
+%ninja_install -C build
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -206,7 +189,7 @@ rm -rf $RPM_BUILD_ROOT
 %files libs
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libcogcore.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libcogcore.so.7
+%attr(755,root,root) %ghost %{_libdir}/libcogcore.so.9
 
 %files devel
 %defattr(644,root,root,755)
