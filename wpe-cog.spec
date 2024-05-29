@@ -12,12 +12,12 @@
 Summary:	Cog Core - WPE WebKit base launcher
 Summary(pl.UTF-8):	Cog Core - narzędzie do uruchamiania środowiska WPE WebKit
 Name:		wpe-cog
-Version:	0.18.0
+Version:	0.18.4
 Release:	1
 License:	MIT
 Group:		Libraries
 Source0:	https://wpewebkit.org/releases/cog-%{version}.tar.xz
-# Source0-md5:	9521458c72322e1b2e39e8b1cca93d24
+# Source0-md5:	0566ab6676b499ebcff372fbe39e24fc
 URL:		https://wpewebkit.org/
 BuildRequires:	gcc >= 5:3.2
 %{!?with_libsoup3:BuildRequires:	glib2-devel >= 1:2.44}
@@ -63,7 +63,7 @@ BuildRequires:	wayland-egl-devel
 BuildRequires:	wayland-protocols
 BuildRequires:	xorg-lib-libxkbcommon-devel
 %if %{with weston}
-BuildRequires:	weston-protocols >= 12.0.0
+BuildRequires:	weston-protocols >= 13.0.0
 %endif
 %endif
 %if %{with x11}
@@ -81,7 +81,7 @@ Requires:	libdrm >= 2.4.71
 Requires:	wayland >= 1.10
 Requires:	wpebackend-fdo >= 1.6.0
 %if %{with weston}
-Requires:	weston >= 12
+Requires:	weston >= 13
 %endif
 %endif
 # cog in PLD used to be different project: http://www.krakoa.dk/old-linux-software.html#COG
